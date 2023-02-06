@@ -30,7 +30,7 @@ public class ParkingServiceTest
 	private static TicketDAO ticketDAO;
 
 	@BeforeEach
-	private void setUpPerTest()
+	public void setUpPerTest()
 	{
 		try
 		{
