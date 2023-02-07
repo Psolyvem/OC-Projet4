@@ -1,5 +1,3 @@
-package com.parkit.parkingsystem.integration.service;
-
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;

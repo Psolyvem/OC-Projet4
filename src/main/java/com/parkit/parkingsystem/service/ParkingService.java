@@ -18,8 +18,8 @@ public class ParkingService
 	private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
 
 	private InputReaderUtil inputReaderUtil;
-	private static ParkingSpotDAO parkingSpotDAO;
-	private static TicketDAO ticketDAO;
+	private ParkingSpotDAO parkingSpotDAO;
+	private TicketDAO ticketDAO;
 
 	public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO)
 	{
@@ -109,7 +109,7 @@ public class ParkingService
 	 * @param vehicleRegNumber
 	 * @return True if the user has already used the parking system before this time
 	 */
-	public static boolean isRecurringUser(String vehicleRegNumber)
+	public boolean isRecurringUser(String vehicleRegNumber)
 	{
 		if(ticketDAO.getOccurrences(vehicleRegNumber) > 1)
 		{
@@ -179,7 +179,7 @@ public class ParkingService
 			Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
 			Date outTime = new Date();
 			ticket.setOutTime(outTime);
-			fareCalculatorService.calculateFare(ticket);
+			fareCalculatorService.calculateFare(ticket, isRecurringUser(ticket.getVehicleRegNumber()));
 			if (ticketDAO.updateTicket(ticket))
 			{
 				ParkingSpot parkingSpot = ticket.getParkingSpot();

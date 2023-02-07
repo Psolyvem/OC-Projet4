@@ -7,7 +7,7 @@ import static java.lang.Math.round;
 
 public class FareCalculatorService
 {
-	public void calculateFare(Ticket ticket)
+	public void calculateFare(Ticket ticket, boolean isRecurrent)
 	{
 		if ((ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())))
 		{
@@ -44,7 +44,7 @@ public class FareCalculatorService
 					throw new IllegalArgumentException("Unknown Parking Type");
 			}
 			// 5% discount if the user is recurrent
-			if(ParkingService.isRecurringUser(ticket.getVehicleRegNumber()))
+			if(isRecurrent)
 			{
 				ticket.setPrice(ticket.getPrice() / 100 * 95);
 			}
