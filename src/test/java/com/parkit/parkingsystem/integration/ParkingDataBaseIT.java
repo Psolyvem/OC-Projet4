@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.integration;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -14,14 +15,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.internal.stubbing.BaseStubbing;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.timeout;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -92,12 +90,19 @@ public class ParkingDataBaseIT
 	}
 
 	@Test
-	public void testRecurrentUser()
+	public void testRecurringUser()
 	{
 		testParkingLotExit();
+		testParkingLotExit();
 		parkingService.processIncomingVehicle();
-		//TODO: Check if an user that is already registered in the DB is correctly handled
-		System.out.println(ticketDAO.getTicket("ABCDEF").getId());
+		// Check if a user that is already registered in the DB is correctly handled
+		assertTrue(parkingService.isRecurringUser("ABCDEF"));
+		// Check that 5% discount is applied on a recurrent user fare
+		Ticket ticket = ticketDAO.getTicket("ABCDEF");;
+		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
+		ticketDAO.updateTicket(ticket);
+		parkingService.processExitingVehicle();
+		assertEquals(Fare.CAR_RATE_PER_HOUR / 100 * 95, ticketDAO.getTicket("ABCDEF").getPrice());
 	}
 
 }

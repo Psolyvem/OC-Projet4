@@ -18,8 +18,8 @@ public class ParkingService
 	private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
 
 	private InputReaderUtil inputReaderUtil;
-	private ParkingSpotDAO parkingSpotDAO;
-	private TicketDAO ticketDAO;
+	private static ParkingSpotDAO parkingSpotDAO;
+	private static TicketDAO ticketDAO;
 
 	public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO)
 	{
@@ -102,6 +102,23 @@ public class ParkingService
 	private boolean getRegisteredUser(String vehicleRegNumber)
 	{
 		return ticketDAO.getTicket(vehicleRegNumber) != null;
+	}
+
+	/**
+	 * Verify if the user is a recurrent number or not by checking the number of occurrences of his reg number in the DB
+	 * @param vehicleRegNumber
+	 * @return True if the user has already used the parking system before this time
+	 */
+	public static boolean isRecurringUser(String vehicleRegNumber)
+	{
+		if(ticketDAO.getOccurrences(vehicleRegNumber) > 1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	public ParkingSpot getNextParkingNumberIfAvailable()
