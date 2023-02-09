@@ -9,7 +9,10 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.util.Date;
+
+import static java.lang.Math.round;
 
 public class ParkingService
 {
@@ -96,6 +99,7 @@ public class ParkingService
 
 	/**
 	 * Check if the user is already present in the DB
+	 *
 	 * @param vehicleRegNumber
 	 * @return true if the user has already been registered at least once in the DB
 	 */
@@ -106,12 +110,13 @@ public class ParkingService
 
 	/**
 	 * Verify if the user is a recurrent number or not by checking the number of occurrences of his reg number in the DB
+	 *
 	 * @param vehicleRegNumber
 	 * @return True if the user has already used the parking system before this time
 	 */
 	public boolean isRecurringUser(String vehicleRegNumber)
 	{
-		if(ticketDAO.getOccurrences(vehicleRegNumber) > 1)
+		if (ticketDAO.getOccurrences(vehicleRegNumber) > 1)
 		{
 			return true;
 		}
@@ -177,7 +182,9 @@ public class ParkingService
 		{
 			String vehicleRegNumber = getVehicleRegNumber();
 			Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-			Date outTime = new Date();
+
+			//Rounding outTime to match the format of the DB (rounded to the second)
+			Date outTime = new Date(((new Date().getTime() + 500) / 1000) * 1000);
 			ticket.setOutTime(outTime);
 			fareCalculatorService.calculateFare(ticket, isRecurringUser(ticket.getVehicleRegNumber()));
 			if (ticketDAO.updateTicket(ticket))

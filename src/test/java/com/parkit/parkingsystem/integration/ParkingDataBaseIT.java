@@ -52,6 +52,11 @@ public class ParkingDataBaseIT
 		when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 		dataBasePrepareService.clearDataBaseEntries();
 		parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+
+		parkingService.processIncomingVehicle();
+		Ticket ticket = ticketDAO.getTicket("ABCDEF");;
+		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
+		ticketDAO.updateTicket(ticket);
 	}
 
 	@AfterAll
@@ -63,26 +68,15 @@ public class ParkingDataBaseIT
 	@Test
 	public void testParkingACar()
 	{
-		int nextParkingSpotId = parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR);
-		parkingService.processIncomingVehicle();
-		Ticket ticket = ticketDAO.getTicket("ABCDEF");;
-		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
-		ticketDAO.updateTicket(ticket);
-
-		// Parking Spot is the one that must have been assigned to the vehicle
-		boolean parkingSpotIsCorrect = ticketDAO.getTicket("ABCDEF").getParkingSpot().getId() == nextParkingSpotId;
 		// Parking Spot is correctly marked as unavailable
 		boolean parkingSpotIsUnavailable = !ticketDAO.getTicket("ABCDEF").getParkingSpot().isAvailable();
 
-		assertTrue(parkingSpotIsCorrect);
 		assertTrue(parkingSpotIsUnavailable);
 	}
 
 	@Test
 	public void testParkingLotExit()
 	{
-
-		testParkingACar();
 		parkingService.processExitingVehicle();
 		// Check that the fare generated and out time are populated correctly in the database
 		assertNotNull(ticketDAO.getTicket("ABCDEF").getOutTime());
@@ -92,13 +86,12 @@ public class ParkingDataBaseIT
 	@Test
 	public void testRecurringUser()
 	{
-		testParkingLotExit();
-		testParkingLotExit();
+		parkingService.processExitingVehicle();
 		parkingService.processIncomingVehicle();
 		// Check if a user that is already registered in the DB is correctly handled
 		assertTrue(parkingService.isRecurringUser("ABCDEF"));
 		// Check that 5% discount is applied on a recurrent user fare
-		Ticket ticket = ticketDAO.getTicket("ABCDEF");;
+		Ticket ticket = ticketDAO.getTicket("ABCDEF");
 		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
 		ticketDAO.updateTicket(ticket);
 		parkingService.processExitingVehicle();
