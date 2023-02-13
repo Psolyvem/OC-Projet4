@@ -1,7 +1,6 @@
 package com.parkit.parkingsystem.integration;
 
 import com.parkit.parkingsystem.constants.Fare;
-import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
@@ -36,7 +35,7 @@ public class ParkingDataBaseIT
 	private static InputReaderUtil inputReaderUtil;
 
 	@BeforeAll
-	public static void setUp() throws Exception
+	public static void setUp()
 	{
 		parkingSpotDAO = new ParkingSpotDAO();
 		parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
@@ -54,7 +53,7 @@ public class ParkingDataBaseIT
 		parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
 		parkingService.processIncomingVehicle();
-		Ticket ticket = ticketDAO.getTicket("ABCDEF");;
+		Ticket ticket = ticketDAO.getTicket("ABCDEF");
 		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
 		ticketDAO.updateTicket(ticket);
 	}

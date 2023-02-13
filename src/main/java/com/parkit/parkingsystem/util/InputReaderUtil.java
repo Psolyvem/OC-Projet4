@@ -24,7 +24,7 @@ public class InputReaderUtil
 		}
 	}
 
-	public String readVehicleRegistrationNumber() throws Exception
+	public String readVehicleRegistrationNumber()
 	{
 		try
 		{
