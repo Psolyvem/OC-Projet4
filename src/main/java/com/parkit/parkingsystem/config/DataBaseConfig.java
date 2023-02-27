@@ -16,10 +16,19 @@ public class DataBaseConfig {
     {
         logger.info("Create DB connection");
         Properties properties = new Properties();
-        properties.load(new FileInputStream("src/main/resources/dbconfig.properties"));
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(
-                properties.getProperty("url"),properties.getProperty("user"),properties.getProperty("password"));
+        FileInputStream fileInputStream = new FileInputStream("src/main/resources/dbconfig.properties");
+        try
+        {
+            properties.load(fileInputStream);
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(properties.getProperty("url"),properties.getProperty("user"),properties.getProperty("password"));
+            fileInputStream.close();
+            return con;
+        }
+        finally
+        {
+            fileInputStream.close();
+        }
     }
 
     public void closeConnection(Connection con){
